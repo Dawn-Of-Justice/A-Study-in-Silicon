@@ -45,7 +45,7 @@ def main():
     MODEL_NAME = "google/gemma-3-27b-it"
     OUTPUT_DIR = "sherlock-gemma-model"
     MAX_LENGTH = 512
-    BATCH_SIZE = 4
+    BATCH_SIZE = 12
     GRADIENT_ACCUMULATION_STEPS = 4
     LEARNING_RATE = 2e-4
     NUM_EPOCHS = 3

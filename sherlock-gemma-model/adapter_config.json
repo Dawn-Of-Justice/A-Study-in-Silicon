@@ -3,7 +3,7 @@
   "alpha_pattern": {},
   "arrow_config": null,
   "auto_mapping": null,
-  "base_model_name_or_path": "google/gemma-2b",
+  "base_model_name_or_path": "google/gemma-3-27b-it",
   "bias": "none",
   "corda_config": null,
   "ensure_weight_tying": false,
@@ -29,9 +29,9 @@
   "rank_pattern": {},
   "revision": null,
   "target_modules": [
+    "k_proj",
     "v_proj",
     "q_proj",
-    "k_proj",
     "o_proj"
   ],
   "target_parameters": null,

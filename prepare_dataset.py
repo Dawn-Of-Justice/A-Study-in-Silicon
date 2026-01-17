@@ -27,14 +27,42 @@ def clean_text(text):
     return text.strip()
 
 
-def split_into_chapters(text):
+def split_into_chapters(text, book_name=''):
     """Split the book into individual chapters."""
-    # Pattern to match chapter headings like "I. A SCANDAL IN BOHEMIA"
-    chapter_pattern = r'\n\n([IVX]+\.\s+[A-Z\s]+)\n\n'
+    # Multiple patterns to match different chapter formats
+    patterns = [
+        r'\n\n([IVX]+\.\s+[A-Z\s]+)\n\n',  # "I. A SCANDAL IN BOHEMIA"
+        r'\n\nCHAPTER ([IVX]+\.?\s*[—\-\.]?\s*[^\n]*)\n\n',  # "CHAPTER I" or "CHAPTER I. Title"
+        r'\n\n([IVX]+\n\n)',  # Just roman numerals
+        r'\n\nChapter ([IVX]+\.?\s*[^\n]*)\n\n',  # "Chapter I" variations
+    ]
     
     chapters = []
-    matches = list(re.finditer(chapter_pattern, text))
+    matches = []
     
+    # Try each pattern until we find chapters
+    for pattern in patterns:
+        matches = list(re.finditer(pattern, text, re.IGNORECASE))
+        if len(matches) > 2:  # Need at least 3 chapters
+            break
+    
+    # If no chapter markers found, split into large chunks
+    if len(matches) < 3:
+        # Split by double newlines or approximate equal chunks
+        words = text.split()
+        chunk_size = 5000  # ~5000 words per chunk
+        
+        for i in range(0, len(words), chunk_size):
+            chunk = ' '.join(words[i:i + chunk_size])
+            if len(chunk) > 500:
+                chapters.append({
+                    'title': f'Section {len(chapters) + 1}',
+                    'content': chunk
+                })
+        
+        return chapters
+    
+    # Process found chapters
     for i, match in enumerate(matches):
         start = match.start()
         # Get chapter title
@@ -85,22 +113,45 @@ def create_training_examples(chapters, chunk_size=1024, overlap=128):
 
 
 def main():
-    # Read the book
-    book_path = Path('dataset/the-adventures-of-sherlock-holmes.txt')
-    with open(book_path, 'r', encoding='utf-8') as f:
-        text = f.read()
+    # Read all books from the dataset folder
+    dataset_path = Path('dataset')
+    book_files = list(dataset_path.glob('*.txt'))
     
-    # Clean and split
-    print("Cleaning text...")
-    text = clean_text(text)
+    print(f"Found {len(book_files)} books in dataset folder")
+    print("Books to process:")
+    for book_file in book_files:
+        print(f"  - {book_file.name}")
     
-    print("Splitting into chapters...")
-    chapters = split_into_chapters(text)
-    print(f"Found {len(chapters)} chapters")
+    all_chapters = []
+    
+    # Process each book
+    for book_file in book_files:
+        print(f"\nProcessing {book_file.name}...")
+        
+        try:
+            with open(book_file, 'r', encoding='utf-8') as f:
+                text = f.read()
+            
+            # Clean and split
+            text = clean_text(text)
+            chapters = split_into_chapters(text, book_file.stem)
+            
+            # Add book name to chapter metadata
+            for chapter in chapters:
+                chapter['book'] = book_file.stem
+            
+            all_chapters.extend(chapters)
+            print(f"  Found {len(chapters)} chapters")
+            
+        except Exception as e:
+            print(f"  Error processing {book_file.name}: {e}")
+            continue
+    
+    print(f"\nTotal chapters from all books: {len(all_chapters)}")
     
     # Create training examples
     print("Creating training examples...")
-    examples = create_training_examples(chapters, chunk_size=512, overlap=64)
+    examples = create_training_examples(all_chapters, chunk_size=512, overlap=64)
     print(f"Created {len(examples)} training examples")
     
     # Split into train/validation (90/10)

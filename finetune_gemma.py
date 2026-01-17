@@ -42,7 +42,7 @@ def tokenize_function(examples, tokenizer, max_length=512):
 
 def main():
     # Configuration
-    MODEL_NAME = "google/gemma-2b"  # You can also use "google/gemma-7b"
+    MODEL_NAME = "google/gemma-3-27b-it"
     OUTPUT_DIR = "sherlock-gemma-model"
     MAX_LENGTH = 512
     BATCH_SIZE = 4

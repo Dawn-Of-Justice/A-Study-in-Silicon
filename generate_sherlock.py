@@ -7,7 +7,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 from peft import PeftModel
 
 
-def load_model(base_model_name="google/gemma-2b", peft_model_path="sherlock-gemma-model"):
+def load_model(base_model_name="google/gemma-3-27b-it", peft_model_path="sherlock-gemma-model"):
     """Load the fine-tuned model."""
     print("Loading model...")
     

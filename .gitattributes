@@ -1,6 +1,8 @@
 *.safetensors filter=lfs diff=lfs merge=lfs -text
 *.pt filter=lfs diff=lfs merge=lfs -text
 sherlock-gemma-model/** filter=lfs diff=lfs merge=lfs -text
+sherlock-gemma-model/checkpoint-*/*.pt filter=lfs diff=lfs merge=lfs -text
+sherlock-gemma-model/checkpoint-*/*.safetensors filter=lfs diff=lfs merge=lfs -text
 sherlock-gemma-model/checkpoint-111/adapter_model.safetensors filter=lfs diff=lfs merge=lfs -text
 sherlock-gemma-model/checkpoint-100/optimizer.pt filter=lfs diff=lfs merge=lfs -text
 sherlock-gemma-model/checkpoint-111/optimizer.pt filter=lfs diff=lfs merge=lfs -text
